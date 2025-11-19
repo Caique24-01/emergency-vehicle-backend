@@ -143,6 +143,9 @@ async def process_video_task(video_path: str, source_id: str, job_id: str, user_
             video_path, source_id, job_id, user_id
         )
         
+        if annotated_video_path:
+            annotated_video_path = annotated_video_path.replace('\\', '/')
+
         detection_ids = []
         
         for detection in detections:
