@@ -305,6 +305,27 @@ async def get_annotated_video(
         filename=f"annotated_{Path(annotated_path).name}"
     )
 
+@router.get("/images", response_model=List[DetectionResponse])
+async def list_image_detections(
+    current_user: UserResponse = Depends(get_current_user),
+    skip: int = 0,
+    limit: int = 100
+):
+    """
+    Lista todas as detecções de imagem do usuário.
+    """
+    db = get_db()
+
+    detections = await db["detections"].find(
+        {"user_id": current_user.id}
+    ).sort("processed_at", -1).skip(skip).limit(limit).to_list(length=limit)
+
+    for detection in detections:
+        detection["_id"] = str(detection["_id"])
+    
+    return detections
+
+
 @router.get("/jobs", response_model=List[JobResponse])
 async def list_detection_jobs(
     current_user: UserResponse = Depends(get_current_user),
